@@ -1,0 +1,5 @@
+rootProject.name = 'palantir-guava-compatibility-agent'
+
+include 'guava-compatibility-agent'
+include 'guava-compatibility-agent-test'
+

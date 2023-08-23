@@ -1,0 +1,13 @@
+apply plugin: 'com.palantir.external-publish-jar'
+apply plugin: 'com.palantir.shadow-jar'
+
+dependencies {
+    shadeTransitively 'net.bytebuddy:byte-buddy'
+}
+
+String agent = 'com.palantir.guavacompat.agent.Agent'
+jar {
+    manifest {
+        attributes('Premain-Class': agent)
+    }
+}

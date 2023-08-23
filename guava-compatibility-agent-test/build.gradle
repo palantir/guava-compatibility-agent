@@ -1,0 +1,20 @@
+dependencies {
+    // Compile tests against guava 16
+    testCompileOnly 'com.google.guava:guava:16.0'
+    // Execute tests using modern guava
+    testRuntimeOnly 'com.google.guava:guava:32.1.2-jre'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+}
+
+// Opt out of standard gradle-consistent-versions features in order to compile against one guava version
+// and test with another.
+versionsLock {
+    disableJavaPluginDefaults()
+}
+
+tasks.withType(Test) {
+    Task jarTask = project.findProject(':guava-compatibility-agent').tasks.getByName('shadowJar')
+    it.dependsOn jarTask
+    it.jvmArgs "-javaagent:${jarTask.outputs.files.singleFile.absolutePath}"
+}

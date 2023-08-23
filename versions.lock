@@ -1,0 +1,2 @@
+# Run ./gradlew --write-locks to regenerate this file
+net.bytebuddy:byte-buddy:1.12.21 (1 constraints: 69059a40)
