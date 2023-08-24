@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Implement backcompat for Futures.addCallback + Futures.addFallback
+  links:
+  - https://github.com/palantir/guava-compatibility-agent/pull/5
