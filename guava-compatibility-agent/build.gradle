@@ -3,6 +3,7 @@ apply plugin: 'com.palantir.shadow-jar'
 
 dependencies {
     shadeTransitively 'net.bytebuddy:byte-buddy'
+    compileOnly 'com.google.guava:guava:32.1.2-jre'
 }
 
 String agent = 'com.palantir.guavacompat.agent.Agent'
