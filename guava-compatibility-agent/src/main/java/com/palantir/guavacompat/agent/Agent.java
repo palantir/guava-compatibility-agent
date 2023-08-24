@@ -101,9 +101,7 @@ public final class Agent {
 
                                 @Override
                                 public TypeList.Generic getTypeVariables() {
-                                    return new TypeList.Generic.Explicit(
-                                            TypeDescription.Generic.Builder.typeVariable("V")
-                                                    .build());
+                                    return new TypeList.Generic.Explicit(typeVarV);
                                 }
                             };
                     TypeDescription.Latent guavaFunction =
@@ -149,11 +147,7 @@ public final class Agent {
 
                                 @Override
                                 public TypeList.Generic getTypeVariables() {
-                                    return new TypeList.Generic.Explicit(
-                                            TypeDescription.Generic.Builder.typeVariable("I")
-                                                    .build(),
-                                            TypeDescription.Generic.Builder.typeVariable("O")
-                                                    .build());
+                                    return new TypeList.Generic.Explicit(typeVarI, typeVarO);
                                 }
                             };
 
@@ -174,9 +168,7 @@ public final class Agent {
 
                                 @Override
                                 public TypeList.Generic getTypeVariables() {
-                                    return new TypeList.Generic.Explicit(
-                                            TypeDescription.Generic.Builder.typeVariable("V")
-                                                    .build());
+                                    return new TypeList.Generic.Explicit(typeVarV);
                                 }
                             };
 
@@ -197,9 +189,7 @@ public final class Agent {
 
                                 @Override
                                 public TypeList.Generic getTypeVariables() {
-                                    return new TypeList.Generic.Explicit(
-                                            TypeDescription.Generic.Builder.typeVariable("V")
-                                                    .build());
+                                    return new TypeList.Generic.Explicit(typeVarV);
                                 }
                             };
 
