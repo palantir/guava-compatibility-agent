@@ -44,6 +44,8 @@ public final class Agent {
     private static final String ASYNC_FUNCTION = "com.google.common.util.concurrent.AsyncFunction";
     private static final String MORE_EXECUTORS = "com.google.common.util.concurrent.MoreExecutors";
     private static final String LISTENING_EXECUTOR = "com.google.common.util.concurrent.ListeningExecutorService";
+    private static final String FUTURE_CALLBACK = "com.google.common.util.concurrent.FutureCallback";
+    private static final String FUTURE_FALLBACK = "com.google.common.util.concurrent.FutureFallback";
 
     @SuppressWarnings("checkstyle:MethodLength")
     public static void premain(String _args, Instrumentation instrumentation) {
@@ -74,10 +76,12 @@ public final class Agent {
         agentBuilder = agentBuilder
                 .type(ElementMatchers.named(FUTURES))
                 .transform((builder, _type, _classLoader, _module, _protection) -> {
-                    TypeDescription.Generic inputTypeVariable =
+                    TypeDescription.Generic typeVarI =
                             TypeDescription.Generic.Builder.typeVariable("I").build();
-                    TypeDescription.Generic outputTypeVariable =
+                    TypeDescription.Generic typeVarO =
                             TypeDescription.Generic.Builder.typeVariable("O").build();
+                    TypeDescription.Generic typeVarV =
+                            TypeDescription.Generic.Builder.typeVariable("V").build();
                     TypeDescription.Latent listenableFuture =
                             new TypeDescription.Latent(
                                     LISTENABLE_FUTURE,
@@ -97,9 +101,7 @@ public final class Agent {
 
                                 @Override
                                 public TypeList.Generic getTypeVariables() {
-                                    return new TypeList.Generic.Explicit(
-                                            TypeDescription.Generic.Builder.typeVariable("V")
-                                                    .build());
+                                    return new TypeList.Generic.Explicit(typeVarV);
                                 }
                             };
                     TypeDescription.Latent guavaFunction =
@@ -145,11 +147,49 @@ public final class Agent {
 
                                 @Override
                                 public TypeList.Generic getTypeVariables() {
-                                    return new TypeList.Generic.Explicit(
-                                            TypeDescription.Generic.Builder.typeVariable("I")
-                                                    .build(),
-                                            TypeDescription.Generic.Builder.typeVariable("O")
-                                                    .build());
+                                    return new TypeList.Generic.Explicit(typeVarI, typeVarO);
+                                }
+                            };
+
+                    TypeDescription.Latent futureCallback =
+                            new TypeDescription.Latent(
+                                    FUTURE_CALLBACK,
+                                    Opcodes.ACC_PUBLIC | Opcodes.ACC_ABSTRACT | Opcodes.ACC_INTERFACE,
+                                    null) {
+                                @Override
+                                public TypeDescription getDeclaringType() {
+                                    return null;
+                                }
+
+                                @Override
+                                public AnnotationList getDeclaredAnnotations() {
+                                    return new AnnotationList.Empty();
+                                }
+
+                                @Override
+                                public TypeList.Generic getTypeVariables() {
+                                    return new TypeList.Generic.Explicit(typeVarV);
+                                }
+                            };
+
+                    TypeDescription.Latent futureFallback =
+                            new TypeDescription.Latent(
+                                    FUTURE_FALLBACK,
+                                    Opcodes.ACC_PUBLIC | Opcodes.ACC_ABSTRACT | Opcodes.ACC_INTERFACE,
+                                    null) {
+                                @Override
+                                public TypeDescription getDeclaringType() {
+                                    return null;
+                                }
+
+                                @Override
+                                public AnnotationList getDeclaredAnnotations() {
+                                    return new AnnotationList.Empty();
+                                }
+
+                                @Override
+                                public TypeList.Generic getTypeVariables() {
+                                    return new TypeList.Generic.Explicit(typeVarV);
                                 }
                             };
 
@@ -180,24 +220,22 @@ public final class Agent {
                                             Modifier.PUBLIC | Modifier.STATIC,
                                             TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(
                                                     Executor.class))));
-                    Generic returnType = TypeDescription.Generic.Builder.parameterizedType(
-                                    listenableFuture, outputTypeVariable)
+                    Generic returnType = TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarO)
                             .build();
                     return builder
                             // transform(future, function) -> transform(future, function, executor)
                             .defineMethod("transform", returnType, Modifier.PUBLIC | Modifier.STATIC)
                             .withParameter(
-                                    TypeDescription.Generic.Builder.parameterizedType(
-                                                    listenableFuture, inputTypeVariable)
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarI)
                                             .build(),
                                     "input")
                             .withParameter(
                                     TypeDescription.Generic.Builder.parameterizedType(
-                                                    guavaFunction, Arrays.asList(inputTypeVariable, outputTypeVariable))
+                                                    guavaFunction, Arrays.asList(typeVarI, typeVarO))
                                             .build(),
                                     "function")
-                            .typeVariable(inputTypeVariable.getSymbol())
-                            .typeVariable(outputTypeVariable.getSymbol())
+                            .typeVariable(typeVarI.getSymbol())
+                            .typeVariable(typeVarO.getSymbol())
                             .intercept(MethodCall.invoke(ElementMatchers.named("transform")
                                             .and(ElementMatchers.isPublic())
                                             .and(ElementMatchers.isStatic())
@@ -212,17 +250,16 @@ public final class Agent {
                             // transform(future, asyncfun) -> transformAsync(future, asyncfun, executor)
                             .defineMethod("transform", returnType, Modifier.PUBLIC | Modifier.STATIC)
                             .withParameter(
-                                    TypeDescription.Generic.Builder.parameterizedType(
-                                                    listenableFuture, inputTypeVariable)
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarI)
                                             .build(),
                                     "input")
                             .withParameter(
                                     TypeDescription.Generic.Builder.parameterizedType(
-                                                    asyncFunction, Arrays.asList(inputTypeVariable, outputTypeVariable))
+                                                    asyncFunction, Arrays.asList(typeVarI, typeVarO))
                                             .build(),
                                     "function")
-                            .typeVariable(inputTypeVariable.getSymbol())
-                            .typeVariable(outputTypeVariable.getSymbol())
+                            .typeVariable(typeVarI.getSymbol())
+                            .typeVariable(typeVarO.getSymbol())
                             .intercept(MethodCall.invoke(ElementMatchers.named("transformAsync")
                                             .and(ElementMatchers.isPublic())
                                             .and(ElementMatchers.isStatic())
@@ -237,18 +274,17 @@ public final class Agent {
                             // transform(future, asyncfun, executor) -> transformAsync(future, asyncfun, executor)
                             .defineMethod("transform", returnType, Modifier.PUBLIC | Modifier.STATIC)
                             .withParameter(
-                                    TypeDescription.Generic.Builder.parameterizedType(
-                                                    listenableFuture, inputTypeVariable)
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarI)
                                             .build(),
                                     "input")
                             .withParameter(
                                     TypeDescription.Generic.Builder.parameterizedType(
-                                                    asyncFunction, Arrays.asList(inputTypeVariable, outputTypeVariable))
+                                                    asyncFunction, Arrays.asList(typeVarI, typeVarO))
                                             .build(),
                                     "function")
                             .withParameter(Executor.class, "executor")
-                            .typeVariable(inputTypeVariable.getSymbol())
-                            .typeVariable(outputTypeVariable.getSymbol())
+                            .typeVariable(typeVarI.getSymbol())
+                            .typeVariable(typeVarO.getSymbol())
                             .intercept(MethodCall.invoke(ElementMatchers.named("transformAsync")
                                             .and(ElementMatchers.isPublic())
                                             .and(ElementMatchers.isStatic())
@@ -256,7 +292,67 @@ public final class Agent {
                                                     listenableFuture,
                                                     asyncFunction,
                                                     TypeDescription.ForLoadedType.of(Executor.class))))
-                                    .withAllArguments());
+                                    .withAllArguments())
+                            // addCallback(future, cb) -> addCallback(future, cb, executor)
+                            .defineMethod(
+                                    "addCallback",
+                                    TypeDescription.ForLoadedType.of(void.class),
+                                    Modifier.PUBLIC | Modifier.STATIC)
+                            .withParameter(
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarV)
+                                            .build(),
+                                    "input")
+                            .withParameter(
+                                    TypeDescription.Generic.Builder.parameterizedType(futureCallback, typeVarV)
+                                            .build(),
+                                    "function")
+                            .typeVariable(typeVarV.getSymbol())
+                            .intercept(MethodCall.invoke(ElementMatchers.named("addCallback")
+                                            .and(ElementMatchers.isPublic())
+                                            .and(ElementMatchers.isStatic())
+                                            .and(ElementMatchers.takesArguments(
+                                                    listenableFuture,
+                                                    futureCallback,
+                                                    TypeDescription.ForLoadedType.of(Executor.class))))
+                                    .with(
+                                            new MethodCall.ArgumentLoader.ForMethodParameter.Factory(0),
+                                            new MethodCall.ArgumentLoader.ForMethodParameter.Factory(1))
+                                    .withMethodCall(invokeDirectExecutor))
+                            // withFallback(future, fb) -> catchingAsync
+                            .defineMethod(
+                                    "withFallback",
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarV)
+                                            .build(),
+                                    Modifier.PUBLIC | Modifier.STATIC)
+                            .withParameter(
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarV)
+                                            .build(),
+                                    "input")
+                            .withParameter(
+                                    TypeDescription.Generic.Builder.parameterizedType(futureFallback, typeVarV)
+                                            .build(),
+                                    "fallback")
+                            .typeVariable(typeVarV.getSymbol())
+                            .intercept(MethodDelegation.to(FallbackAdapterHandler.class))
+                            // withFallback(future, fb, executor) -> catchingAsync
+                            .defineMethod(
+                                    "withFallback",
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarV)
+                                            .build(),
+                                    Modifier.PUBLIC | Modifier.STATIC)
+                            .withParameter(
+                                    TypeDescription.Generic.Builder.parameterizedType(listenableFuture, typeVarV)
+                                            .build(),
+                                    "input")
+                            .withParameter(
+                                    TypeDescription.Generic.Builder.parameterizedType(futureFallback, typeVarV)
+                                            .build(),
+                                    "fallback")
+                            .withParameter(
+                                    TypeDescription.Generic.OfNonGenericType.ForLoadedType.of(Executor.class),
+                                    "executor")
+                            .typeVariable(typeVarV.getSymbol())
+                            .intercept(MethodDelegation.to(FallbackAdapterHandler.class));
                 });
         // MoreExecutors.sameThreadExecutor() -> MoreExecutors.newDirectExecutorService()
         agentBuilder = agentBuilder

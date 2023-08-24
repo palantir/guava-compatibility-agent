@@ -11,6 +11,9 @@ newer version of guava is available on the classpath.
 * `Futures.transform(future, function)` -> Delegates to the modern `Futures.transform(future, function, MoreExecutors.directExecutor())`
 * `Futures.transform(future, asyncFunction, exec)` -> Delegates to the modern `Futures.transformAsync(future, asyncFunction, exec)`
 * `Futures.transform(future, asyncFunction)` -> Delegates to the modern `Futures.transformAsync(future, asyncFunction, MoreExecutors.directExecutor())`
+* `Futures.addCallback(future, callback)` -> `Futures.addCallback(future, callback, MoreExecutors.directExecutor())`
+* `Futures.withFallback(future, fallback, executor)` -> `Futures.catchingAsync(future, Throwable.class, fallback, executor)`
+* `Futures.withFallback(future, fallback)` -> `Futures.catchingAsync(future, Throwable.class, fallback, MoreExecutors.directExecutor())`
 
 ## Not handled yet
 
