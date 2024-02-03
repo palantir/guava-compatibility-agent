@@ -5,6 +5,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.6.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:5.31.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.13.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:3.0.0'
@@ -25,6 +26,7 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'com.palantir.java-format'
     apply plugin: 'com.palantir.baseline-class-uniqueness'
+    apply plugin: 'com.palantir.jakarta-package-alignment'
 
     version rootProject.version
     group 'com.palantir.guava-compatibility-agent'
