@@ -1,5 +1,5 @@
 com.fasterxml.jackson.core:jackson-databind = 2.15.2
 com.fasterxml.jackson.*:* = 2.15.3
-org.junit.jupiter:* = 5.10.1
-org.assertj:assertj-core = 3.24.2
-net.bytebuddy:* = 1.14.9
+org.junit.jupiter:* = 5.10.3
+org.assertj:assertj-core = 3.26.0
+net.bytebuddy:* = 1.14.17
