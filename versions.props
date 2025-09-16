@@ -1,4 +1,4 @@
 com.fasterxml.jackson.*:* = 2.15.3
-org.junit.jupiter:* = 5.10.1
-org.assertj:assertj-core = 3.24.2
-net.bytebuddy:* = 1.14.9
+org.junit.jupiter:* = 5.13.4
+org.assertj:assertj-core = 3.27.4
+net.bytebuddy:* = 1.17.7
