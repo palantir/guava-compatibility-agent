@@ -15,3 +15,25 @@ com.google.j2objc:j2objc-annotations:2.8 (1 constraints: be09f5a0)
 net.bytebuddy:byte-buddy:1.14.9 (1 constraints: 41053e3b)
 
 org.checkerframework:checker-qual:3.33.0 (1 constraints: 4b0a46bf)
+
+
+
+[Test dependencies]
+
+org.apiguardian:apiguardian-api:1.1.2 (6 constraints: 5366ce6e)
+
+org.junit.jupiter:junit-jupiter:5.10.1 (1 constraints: 11051e36)
+
+org.junit.jupiter:junit-jupiter-api:5.10.1 (3 constraints: ee2f7b50)
+
+org.junit.jupiter:junit-jupiter-engine:5.10.1 (1 constraints: 340efe49)
+
+org.junit.jupiter:junit-jupiter-params:5.10.1 (1 constraints: 340efe49)
+
+org.junit.platform:junit-platform-commons:1.12.0 (2 constraints: 2e215283)
+
+org.junit.platform:junit-platform-engine:1.12.0 (2 constraints: 46239344)
+
+org.junit.platform:junit-platform-launcher:1.12.0 (1 constraints: 36052f3b)
+
+org.opentest4j:opentest4j:1.3.0 (2 constraints: cf209249)
