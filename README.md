@@ -1,3 +1,7 @@
+<p align="right">
+<a href="https://autorelease.general.dmz.palantir.tech/palantir/guava-compatibility-agent"><img src="https://img.shields.io/badge/Perform%20an-Autorelease-success.svg" alt="Autorelease"></a>
+</p>
+
 ## About guava-compatibility-agent
 
 Guava compatibility agent which allows a subset of common APIs removed
