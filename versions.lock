@@ -12,6 +12,6 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:2.8 (1 constraints: be09f5a0)
 
-net.bytebuddy:byte-buddy:1.18.11 (1 constraints: 6e05b040)
+net.bytebuddy:byte-buddy:1.18.12 (1 constraints: 6f05b140)
 
 org.checkerframework:checker-qual:3.33.0 (1 constraints: 4b0a46bf)
