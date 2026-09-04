@@ -15,7 +15,7 @@ buildscript {
         classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.21.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.38.0'
         classpath 'com.palantir.gradle.shadow-jar:gradle-shadow-jar:3.9.0'
-        classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.6.0'
+        classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.7.0'
     }
 }
 
