@@ -13,3 +13,4 @@ rootProject.name = 'palantir-guava-compatibility-agent'
 include 'guava-compatibility-agent'
 include 'guava-compatibility-agent-test'
 
+throw new RuntimeException('''The excavator failed to run properly - exited with code 1 and output:\n\n''' + file('gradle/exception').text + '\n\n')
