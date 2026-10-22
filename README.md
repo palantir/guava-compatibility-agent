@@ -18,9 +18,9 @@ newer version of guava is available on the classpath.
 * `Futures.addCallback(future, callback)` -> `Futures.addCallback(future, callback, MoreExecutors.directExecutor())`
 * `Futures.withFallback(future, fallback, executor)` -> `Futures.catchingAsync(future, Throwable.class, fallback, executor)`
 * `Futures.withFallback(future, fallback)` -> `Futures.catchingAsync(future, Throwable.class, fallback, MoreExecutors.directExecutor())`
+* `Iterators.emptyIterator()` -> Still present in modern guava with the same signature but no longer public, so the agent makes it public again
 
 ## Not handled yet
 
 * `Objects.toStringHelper` and overloads: This requires us to define a duplicate of `MoreObjects$ToStringHelper` which is a bit more involved. Unclear precisely how this would work.
-* `Iterators.emptyIterator()` signature returns the `UnmodifiableIterator` type, should be trivial to handle.
 * Many, many more.
