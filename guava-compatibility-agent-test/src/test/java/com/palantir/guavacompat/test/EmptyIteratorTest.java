@@ -17,18 +17,23 @@
 package com.palantir.guavacompat.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.Iterators;
 import java.util.Iterator;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class EmptyIteratorTest {
 
     @Test
-    @Disabled("Iterators.emptyIterator() backcompat has not been implemented yet")
-    void useSameThreadExecutor() {
+    void emptyIteratorIsExhausted() {
         Iterator<String> empty = Iterators.emptyIterator();
         assertThat(empty).isExhausted();
+    }
+
+    @Test
+    void emptyIteratorIsUnmodifiable() {
+        Iterator<String> empty = Iterators.emptyIterator();
+        assertThatThrownBy(empty::remove).isInstanceOf(UnsupportedOperationException.class);
     }
 }

@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: The agent restores `Iterators.emptyIterator()` for callers compiled against old guava by making the existing method public again.
+  links:
+  - https://github.com/palantir/guava-compatibility-agent/pull/165
