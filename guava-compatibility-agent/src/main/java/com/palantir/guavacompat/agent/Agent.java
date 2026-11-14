@@ -23,8 +23,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import net.bytebuddy.agent.builder.AgentBuilder;
+import net.bytebuddy.asm.ModifierAdjustment;
 import net.bytebuddy.description.annotation.AnnotationList;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.Generic;
 import net.bytebuddy.description.type.TypeList;
@@ -46,6 +48,7 @@ public final class Agent {
     private static final String LISTENING_EXECUTOR = "com.google.common.util.concurrent.ListeningExecutorService";
     private static final String FUTURE_CALLBACK = "com.google.common.util.concurrent.FutureCallback";
     private static final String FUTURE_FALLBACK = "com.google.common.util.concurrent.FutureFallback";
+    private static final String ITERATORS = "com.google.common.collect.Iterators";
 
     @SuppressWarnings("checkstyle:MethodLength")
     public static void premain(String _args, Instrumentation instrumentation) {
@@ -388,8 +391,17 @@ public final class Agent {
                                     .and(ElementMatchers.takesNoArguments())));
                 });
 
-        // TODO(ckozak): Iterators.emptyIterator() -> public
-        // Could use a value resulting from ImmutableList.<T>of().listIterator()
+        // Iterators.emptyIterator() still exists in modern guava with the same signature, but it is no longer public,
+        // so old callers fail with IllegalAccessError. Make it public again.
+        agentBuilder = agentBuilder
+                .type(ElementMatchers.named(ITERATORS))
+                .transform((builder, _type, _classLoader, _module, _protection) ->
+                        builder.visit(new ModifierAdjustment()
+                                .withMethodModifiers(
+                                        ElementMatchers.named("emptyIterator")
+                                                .and(ElementMatchers.isStatic())
+                                                .and(ElementMatchers.takesNoArguments()),
+                                        Visibility.PUBLIC)));
 
         agentBuilder.installOn(instrumentation);
     }
